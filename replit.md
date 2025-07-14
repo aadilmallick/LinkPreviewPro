@@ -35,17 +35,24 @@ Preferred communication style: Simple, everyday language.
 
 ### Data Models
 - **Link Previews**: Stores URL metadata including title, description, image, favicon, site name, and creation timestamp
-- **Schema Definition**: Centralized in `shared/schema.ts` with Zod validation
+- **Preview Styles**: Stores custom styling options including colors, layout, border radius, and visibility settings
+- **Schema Definition**: Centralized in `shared/schema.ts` with Zod validation for all data types
 
 ### Core Features
 1. **URL Input & Validation**: Real-time URL validation with visual feedback
 2. **Metadata Extraction**: Server-side web scraping using Cheerio to extract Open Graph, Twitter Card, and standard HTML metadata
 3. **Preview Generation**: Rich preview cards with fallback handling for missing data
-4. **Example URLs**: Pre-configured example URLs for quick testing
-5. **Responsive Design**: Mobile-first design with responsive layouts
+4. **Custom Styling System**: Multiple predefined styles (Default, Dark, Minimal, Card) with different layouts (horizontal, vertical, compact)
+5. **Smart Caching**: Automatic caching of previews with cache age indicators and manual refresh options
+6. **Image Export**: Export preview cards as PNG/JPEG/WebP images with customizable dimensions and quality
+7. **Example URLs**: Pre-configured example URLs for quick testing
+8. **Responsive Design**: Mobile-first design with responsive layouts
 
 ### API Endpoints
-- `POST /api/preview`: Accepts URL and returns extracted metadata
+- `POST /api/preview`: Accepts URL and returns extracted metadata (supports forceRefresh option)
+- `GET /api/styles`: Returns available preview styles
+- `POST /api/styles`: Creates custom preview styles  
+- `POST /api/export`: Exports preview as image with customizable format and dimensions
 - Error handling for invalid URLs and extraction failures
 
 ## Data Flow

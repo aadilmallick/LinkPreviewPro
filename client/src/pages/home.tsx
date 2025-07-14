@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { Link } from "lucide-react";
 import { LinkPreviewForm } from "@/components/link-preview-form";
-import { PreviewCard } from "@/components/preview-card";
+import { StyledPreviewCard } from "@/components/styled-preview-card";
+import { StyleSelector } from "@/components/style-selector";
+import { CacheControls } from "@/components/cache-controls";
 import { ExampleUrls } from "@/components/example-urls";
 import { FeaturesSection } from "@/components/features-section";
-import type { LinkPreview } from "@shared/schema";
+import type { LinkPreview, PreviewStyle } from "@shared/schema";
 
 export default function Home() {
   const [previewData, setPreviewData] = useState<LinkPreview | null>(null);
+  const [selectedStyle, setSelectedStyle] = useState<PreviewStyle | null>(null);
   const [inputUrl, setInputUrl] = useState("");
 
   const handlePreviewGenerated = (preview: LinkPreview) => {
@@ -16,6 +19,14 @@ export default function Home() {
 
   const handleExampleUrlSelect = (url: string) => {
     setInputUrl(url);
+  };
+
+  const handleStyleSelect = (style: PreviewStyle) => {
+    setSelectedStyle(style);
+  };
+
+  const handlePreviewUpdated = (preview: LinkPreview) => {
+    setPreviewData(preview);
   };
 
   return (
@@ -43,10 +54,28 @@ export default function Home() {
           onInputUrlChange={setInputUrl}
         />
 
+        {/* Style Selector */}
+        <StyleSelector 
+          selectedStyleId={selectedStyle?.id || null}
+          onStyleSelect={handleStyleSelect}
+        />
+
+        {/* Cache Controls */}
+        {previewData && (
+          <CacheControls 
+            preview={previewData}
+            onPreviewUpdated={handlePreviewUpdated}
+            currentUrl={inputUrl}
+          />
+        )}
+
         {/* Preview Card */}
         {previewData && (
           <div className="mb-8">
-            <PreviewCard preview={previewData} />
+            <StyledPreviewCard 
+              preview={previewData} 
+              style={selectedStyle}
+            />
           </div>
         )}
 
