@@ -1,10 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { linkPreviewRequestSchema, previewStyleSchema, exportRequestSchema } from "@shared/schema";
+import { linkPreviewRequestSchema, previewStyleSchema } from "@shared/schema";
 import axios from "axios";
 import * as cheerio from "cheerio";
-import puppeteer from "puppeteer";
 
 async function extractMetadata(url: string) {
   try {
@@ -154,138 +153,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Export preview as image
-  app.post("/api/export", async (req, res) => {
-    try {
-      const { previewId, format, width, height, quality } = exportRequestSchema.parse(req.body);
-      
-      // Find the preview in storage
-      const preview = Array.from((storage as any).linkPreviews.values()).find((p: any) => p.id === previewId);
-      if (!preview) {
-        return res.status(404).json({ message: "Preview not found" });
-      }
-
-      // Generate HTML for the preview card
-      const html = generatePreviewHTML(preview, { width, height });
-      
-      // Launch puppeteer to render the image
-      const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-      
-      const page = await browser.newPage();
-      await page.setViewport({ width, height });
-      await page.setContent(html, { waitUntil: 'networkidle0' });
-      
-      const imageBuffer = await page.screenshot({
-        type: format as 'png' | 'jpeg' | 'webp',
-        quality: format === 'jpeg' ? Math.round(quality * 100) : undefined,
-        fullPage: false
-      });
-      
-      await browser.close();
-      
-      // Set appropriate headers
-      res.setHeader('Content-Type', `image/${format}`);
-      res.setHeader('Content-Disposition', `attachment; filename="preview.${format}"`);
-      res.send(imageBuffer);
-    } catch (error) {
-      console.error('Export error:', error);
-      res.status(500).json({ 
-        message: error instanceof Error ? error.message : "Export failed" 
-      });
-    }
-  });
-
   const httpServer = createServer(app);
   return httpServer;
-}
-
-function generatePreviewHTML(preview: any, options: { width: number; height: number }) {
-  const { width, height } = options;
-  
-  return `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f9fafb;
-            padding: 20px;
-            width: ${width}px;
-            height: ${height}px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          .preview-card {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
-            overflow: hidden;
-            max-width: ${width - 40}px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-          }
-          .preview-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            background: #f3f4f6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #9ca3af;
-          }
-          .preview-content {
-            padding: 16px;
-          }
-          .preview-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
-          }
-          .favicon {
-            width: 16px;
-            height: 16px;
-            border-radius: 2px;
-          }
-          .domain {
-            font-size: 12px;
-            color: #6b7280;
-          }
-          .title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 8px;
-            line-height: 1.3;
-          }
-          .description {
-            font-size: 14px;
-            color: #6b7280;
-            line-height: 1.4;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="preview-card">
-          ${preview.image ? `<img src="${preview.image}" alt="Preview" class="preview-image" />` : 
-            '<div class="preview-image">🌐</div>'}
-          <div class="preview-content">
-            <div class="preview-header">
-              ${preview.favicon ? `<img src="${preview.favicon}" alt="Favicon" class="favicon" />` : '🌐'}
-              <span class="domain">${new URL(preview.url).hostname.replace('www.', '')}</span>
-            </div>
-            <div class="title">${preview.title || 'No title available'}</div>
-            ${preview.description ? `<div class="description">${preview.description}</div>` : ''}
-          </div>
-        </div>
-      </body>
-    </html>
-  `;
 }

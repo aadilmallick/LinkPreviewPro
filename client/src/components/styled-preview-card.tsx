@@ -119,7 +119,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
               Copy
             </Button>
             <div className="flex gap-2">
-              <ExportDialog preview={preview} />
+              <ExportDialog preview={preview} style={style} />
               <Button asChild size="sm" style={{ backgroundColor: cardStyle.accentColor }}>
                 <a
                   href={preview.url}
@@ -207,7 +207,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
               Copy URL
             </Button>
             <div className="flex gap-2">
-              <ExportDialog preview={preview} />
+              <ExportDialog preview={preview} style={style} />
               <Button asChild size="sm" style={{ backgroundColor: cardStyle.accentColor }}>
                 <a
                   href={preview.url}
@@ -301,7 +301,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
               Copy URL
             </Button>
             <div className="flex gap-2">
-              <ExportDialog preview={preview} />
+              <ExportDialog preview={preview} style={style} />
               <Button asChild size="sm" style={{ backgroundColor: cardStyle.accentColor }}>
                 <a
                   href={preview.url}

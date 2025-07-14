@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 import { Download, Loader2, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -7,64 +6,203 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import type { LinkPreview, ExportRequest } from "@shared/schema";
+import html2canvas from "html2canvas";
+import type { LinkPreview, PreviewStyle } from "@shared/schema";
 
 interface ExportDialogProps {
   preview: LinkPreview;
+  style?: PreviewStyle | null;
 }
 
-export function ExportDialog({ preview }: ExportDialogProps) {
+export function ExportDialog({ preview, style }: ExportDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [format, setFormat] = useState<"png" | "jpeg" | "webp">("png");
   const [width, setWidth] = useState([800]);
   const [height, setHeight] = useState([400]);
   const [quality, setQuality] = useState([0.9]);
+  const [isExporting, setIsExporting] = useState(false);
   const { toast } = useToast();
 
-  const exportMutation = useMutation({
-    mutationFn: async (data: ExportRequest) => {
-      const response = await apiRequest('POST', '/api/export', data);
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Export failed');
-      }
-      return response.blob();
-    },
-    onSuccess: (blob: Blob) => {
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
+  const handleExport = async () => {
+    setIsExporting(true);
+    
+    try {
+      // Create a temporary preview element for export
+      const exportElement = await createExportElement();
+      
+      // Capture the element as canvas
+      const canvas = await html2canvas(exportElement, {
+        width: width[0],
+        height: height[0],
+        backgroundColor: style?.backgroundColor || '#ffffff',
+        scale: 2, // For better quality
+        useCORS: true,
+        allowTaint: true,
+      });
+      
+      // Convert canvas to blob
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          resolve(blob!);
+        }, `image/${format}`, format === 'jpeg' ? quality[0] : undefined);
+      });
+      
+      // Download the image
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `preview.${format}`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      URL.revokeObjectURL(url);
+      
+      // Clean up
+      document.body.removeChild(exportElement);
       
       toast({
         title: "Export successful!",
         description: "Your preview image has been downloaded.",
       });
       setIsOpen(false);
-    },
-    onError: (error: Error) => {
+    } catch (error) {
+      console.error('Export error:', error);
       toast({
         title: "Export failed",
-        description: error.message,
+        description: "Failed to generate image. Please try again.",
         variant: "destructive",
       });
-    },
-  });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
-  const handleExport = () => {
-    exportMutation.mutate({
-      previewId: preview.id,
-      format,
-      width: width[0],
-      height: height[0],
-      quality: quality[0],
-    });
+  const createExportElement = async (): Promise<HTMLElement> => {
+    // Create a temporary container
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.top = '-9999px';
+    container.style.left = '-9999px';
+    container.style.width = `${width[0]}px`;
+    container.style.height = `${height[0]}px`;
+    container.style.padding = '20px';
+    container.style.backgroundColor = '#f9fafb';
+    container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    
+    // Create the preview card
+    const cardElement = document.createElement('div');
+    const cardStyle = style || {
+      borderRadius: "12px",
+      borderColor: "#e5e7eb",
+      backgroundColor: "#ffffff",
+      textColor: "#111827",
+      accentColor: "#3b82f6",
+      showImage: true,
+      showFavicon: true,
+      layout: "horizontal"
+    };
+    
+    cardElement.style.borderRadius = cardStyle.borderRadius!;
+    cardElement.style.border = `1px solid ${cardStyle.borderColor}`;
+    cardElement.style.backgroundColor = cardStyle.backgroundColor!;
+    cardElement.style.color = cardStyle.textColor!;
+    cardElement.style.overflow = 'hidden';
+    cardElement.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+    cardElement.style.maxWidth = `${width[0] - 40}px`;
+    cardElement.style.margin = 'auto';
+    
+    // Build the card content based on layout
+    const getCleanUrl = (url: string) => {
+      try {
+        const urlObj = new URL(url);
+        return urlObj.hostname.replace('www.', '');
+      } catch {
+        return url;
+      }
+    };
+    
+    if (cardStyle.layout === 'vertical') {
+      cardElement.innerHTML = `
+        ${cardStyle.showImage && preview.image ? 
+          `<div style="aspect-ratio: 2/1; background: #f3f4f6; position: relative; overflow: hidden;">
+             <img src="${preview.image}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'" />
+           </div>` : 
+          cardStyle.showImage ? 
+            '<div style="aspect-ratio: 2/1; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #9ca3af;">🌐</div>' : 
+            ''
+        }
+        <div style="padding: 16px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 12px; opacity: 0.6;">
+            ${cardStyle.showFavicon && preview.favicon ? 
+              `<img src="${preview.favicon}" alt="Favicon" style="width: 16px; height: 16px; border-radius: 2px;" onerror="this.textContent='🌐'; this.style.width='auto'" />` : 
+              cardStyle.showFavicon ? '🌐' : ''
+            }
+            <span>${getCleanUrl(preview.url)}</span>
+          </div>
+          <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 8px; line-height: 1.3;">
+            ${preview.title || 'No title available'}
+          </h2>
+          ${preview.description ? 
+            `<p style="font-size: 14px; opacity: 0.75; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+               ${preview.description}
+             </p>` : 
+            ''
+          }
+        </div>
+      `;
+    } else {
+      // Horizontal layout (default)
+      cardElement.innerHTML = `
+        <div style="display: flex;">
+          ${cardStyle.showImage ? 
+            `<div style="width: 192px; flex-shrink: 0;">
+               ${preview.image ? 
+                 `<img src="${preview.image}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; background: #f3f4f6;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\"height: 100%; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #9ca3af;\">🌐</div>'" />` :
+                 '<div style="height: 100%; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #9ca3af;">🌐</div>'
+               }
+             </div>` : 
+            ''
+          }
+          <div style="flex: 1; padding: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 12px; opacity: 0.6;">
+              ${cardStyle.showFavicon && preview.favicon ? 
+                `<img src="${preview.favicon}" alt="Favicon" style="width: 16px; height: 16px; border-radius: 2px;" onerror="this.textContent='🌐'; this.style.width='auto'" />` : 
+                cardStyle.showFavicon ? '🌐' : ''
+              }
+              <span>${getCleanUrl(preview.url)}</span>
+            </div>
+            <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 8px; line-height: 1.3;">
+              ${preview.title || 'No title available'}
+            </h2>
+            ${preview.description ? 
+              `<p style="font-size: 14px; opacity: 0.75; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                 ${preview.description}
+               </p>` : 
+              ''
+            }
+          </div>
+        </div>
+      `;
+    }
+    
+    container.appendChild(cardElement);
+    document.body.appendChild(container);
+    
+    // Wait for images to load
+    const images = container.querySelectorAll('img');
+    await Promise.allSettled(Array.from(images).map(img => {
+      return new Promise((resolve) => {
+        if (img.complete) {
+          resolve(null);
+        } else {
+          img.onload = () => resolve(null);
+          img.onerror = () => resolve(null);
+          setTimeout(() => resolve(null), 3000); // Timeout after 3 seconds
+        }
+      });
+    }));
+    
+    return container;
   };
 
   return (
@@ -153,10 +291,10 @@ export function ExportDialog({ preview }: ExportDialogProps) {
           {/* Export Button */}
           <Button 
             onClick={handleExport} 
-            disabled={exportMutation.isPending}
+            disabled={isExporting}
             className="w-full"
           >
-            {exportMutation.isPending ? (
+            {isExporting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Exporting...
