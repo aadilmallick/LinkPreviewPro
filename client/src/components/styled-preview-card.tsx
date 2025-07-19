@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Copy, ExternalLink, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +13,7 @@ interface StyledPreviewCardProps {
 export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
   const { toast } = useToast();
   const [imageError, setImageError] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const handleCopyUrl = async () => {
     try {
@@ -69,7 +70,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
 
   if (isCompact) {
     return (
-      <div className={cardClasses} style={cardInlineStyles}>
+      <div className={cardClasses} style={cardInlineStyles} ref={cardRef}>
         <div className="p-4">
           {/* Header with favicon and URL */}
           <div className="flex items-center gap-3 mb-3">
@@ -119,7 +120,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
               Copy
             </Button>
             <div className="flex gap-2">
-              <ExportDialog preview={preview} style={style} />
+              <ExportDialog preview={preview} style={style} cardRef={cardRef} />
               <Button asChild size="sm" style={{ backgroundColor: cardStyle.accentColor }}>
                 <a
                   href={preview.url}
@@ -140,7 +141,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
 
   if (isVertical) {
     return (
-      <div className={cardClasses} style={cardInlineStyles}>
+      <div className={cardClasses} style={cardInlineStyles} ref={cardRef}>
         {/* Image */}
         {cardStyle.showImage && preview.image && !imageError ? (
           <div className="aspect-[2/1] bg-gray-100 relative overflow-hidden">
@@ -207,7 +208,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
               Copy URL
             </Button>
             <div className="flex gap-2">
-              <ExportDialog preview={preview} style={style} />
+              <ExportDialog preview={preview} style={style} cardRef={cardRef} />
               <Button asChild size="sm" style={{ backgroundColor: cardStyle.accentColor }}>
                 <a
                   href={preview.url}
@@ -228,7 +229,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
 
   // Default horizontal layout
   return (
-    <div className={cardClasses} style={cardInlineStyles}>
+    <div className={cardClasses} style={cardInlineStyles} ref={cardRef}>
       <div className="flex">
         {/* Image section */}
         {cardStyle.showImage && (
@@ -301,7 +302,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
               Copy URL
             </Button>
             <div className="flex gap-2">
-              <ExportDialog preview={preview} style={style} />
+              <ExportDialog preview={preview} style={style} cardRef={cardRef} />
               <Button asChild size="sm" style={{ backgroundColor: cardStyle.accentColor }}>
                 <a
                   href={preview.url}
