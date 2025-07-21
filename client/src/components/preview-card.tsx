@@ -6,9 +6,10 @@ import type { LinkPreview } from "@/types";
 
 interface PreviewCardProps {
   preview: LinkPreview;
+  hideButtons?: boolean;
 }
 
-export function PreviewCard({ preview }: PreviewCardProps) {
+export function PreviewCard({ preview, hideButtons }: PreviewCardProps) {
   const { toast } = useToast();
   const [imageError, setImageError] = useState(false);
 
@@ -100,28 +101,30 @@ export function PreviewCard({ preview }: PreviewCardProps) {
         )}
 
         {/* Actions */}
-        <div className="flex items-center justify-between preview-card-actions-unstyled">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleCopyUrl}
-            className="text-gray-500 hover:text-primary"
-          >
-            <Copy className="w-4 h-4 mr-2" />
-            Copy URL
-          </Button>
-          <Button asChild size="sm">
-            <a
-              href={preview.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2"
+        {!hideButtons && (
+          <div className="flex items-center justify-between preview-card-actions-unstyled">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopyUrl}
+              className="text-gray-500 hover:text-primary"
             >
-              Visit Site
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          </Button>
-        </div>
+              <Copy className="w-4 h-4 mr-2" />
+              Copy URL
+            </Button>
+            <Button asChild size="sm">
+              <a
+                href={preview.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2"
+              >
+                Visit Site
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

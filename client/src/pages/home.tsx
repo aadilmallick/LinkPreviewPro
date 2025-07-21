@@ -15,6 +15,7 @@ export default function Home() {
   const [previewData, setPreviewData] = useState<LinkPreview | null>(null);
   const [selectedStyle, setSelectedStyle] = useState<PreviewStyle | null>(null);
   const [inputUrl, setInputUrl] = useState("");
+  const [hideButtons, setHideButtons] = useState(false);
 
   const handlePreviewGenerated = (preview: LinkPreview) => {
     setPreviewData(preview);
@@ -79,8 +80,14 @@ export default function Home() {
         {/* Preview Card */}
         {previewData && (
           <div className="mb-8">
-            <HideButtonsSwitch />
-            <StyledPreviewCard preview={previewData} style={selectedStyle} />
+            <div className="flex items-center gap-2 mb-4">
+              <Switch
+                checked={hideButtons}
+                onCheckedChange={setHideButtons}
+              />
+              <Label>Hide Buttons</Label>
+            </div>
+            <StyledPreviewCard preview={previewData} style={selectedStyle} hideButtons={hideButtons} />
           </div>
         )}
 
@@ -116,40 +123,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function HideButtonsSwitch() {
-  const [hideButtons, setHideButtons] = useState(false);
-  const restoreButtons = useRef<() => void>(() => {});
-  function hideButtonsFn() {
-    const buttonsToHide = [
-      document.querySelector(".preview-card-actions-styled") as HTMLElement,
-      document.querySelector(".preview-card-actions-unstyled") as HTMLElement,
-    ];
-    console.log(buttonsToHide);
-    buttonsToHide.forEach((button) => {
-      if (!button) throw new Error("Button not found");
-    });
-    const { restore } = hideElements(buttonsToHide);
-    return restore;
-  }
-
-  return (
-    <div className="flex items-center gap-2 mb-4">
-      <Switch
-        checked={hideButtons}
-        onCheckedChange={(checked) => {
-          setHideButtons(checked);
-          if (checked) {
-            restoreButtons.current = hideButtonsFn();
-          } else {
-            restoreButtons.current();
-          }
-        }}
-      />
-      <Label>Hide Buttons</Label>
     </div>
   );
 }

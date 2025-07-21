@@ -8,9 +8,10 @@ import type { LinkPreview, PreviewStyle } from "@/types";
 interface StyledPreviewCardProps {
   preview: LinkPreview;
   style?: PreviewStyle | null;
+  hideButtons?: boolean;
 }
 
-export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
+export function StyledPreviewCard({ preview, style, hideButtons }: StyledPreviewCardProps) {
   const { toast } = useToast();
   const [imageError, setImageError] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -108,39 +109,41 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
           )}
 
           {/* Actions */}
-          <div
-            className="flex items-center justify-between"
-            id="preview-card-actions"
-          >
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleCopyUrl}
-              className="opacity-60 hover:opacity-100"
-              style={{ color: cardStyle.textColor }}
+          {!hideButtons && (
+            <div
+              className="flex items-center justify-between"
+              id="preview-card-actions"
             >
-              <Copy className="w-4 h-4 mr-2" />
-              Copy
-            </Button>
-            <div className="flex gap-2">
-              <ExportDialog preview={preview} style={style} cardRef={cardRef} />
               <Button
-                asChild
+                variant="ghost"
                 size="sm"
-                style={{ backgroundColor: cardStyle.accentColor }}
+                onClick={handleCopyUrl}
+                className="opacity-60 hover:opacity-100"
+                style={{ color: cardStyle.textColor }}
               >
-                <a
-                  href={preview.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-white"
-                >
-                  Visit
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                <Copy className="w-4 h-4 mr-2" />
+                Copy
               </Button>
+              <div className="flex gap-2">
+                <ExportDialog preview={preview} style={style} cardRef={cardRef} />
+                <Button
+                  asChild
+                  size="sm"
+                  style={{ backgroundColor: cardStyle.accentColor }}
+                >
+                  <a
+                    href={preview.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-white"
+                  >
+                    Visit
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     );
@@ -203,36 +206,38 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
           )}
 
           {/* Actions */}
-          <div className="flex items-center justify-between preview-card-actions-styled">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleCopyUrl}
-              className="opacity-60 hover:opacity-100"
-              style={{ color: cardStyle.textColor }}
-            >
-              <Copy className="w-4 h-4 mr-2" />
-              Copy URL
-            </Button>
-            <div className="flex gap-2">
-              <ExportDialog preview={preview} style={style} cardRef={cardRef} />
+          {!hideButtons && (
+            <div className="flex items-center justify-between preview-card-actions-styled">
               <Button
-                asChild
+                variant="ghost"
                 size="sm"
-                style={{ backgroundColor: cardStyle.accentColor }}
+                onClick={handleCopyUrl}
+                className="opacity-60 hover:opacity-100"
+                style={{ color: cardStyle.textColor }}
               >
-                <a
-                  href={preview.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-white"
-                >
-                  Visit Site
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                <Copy className="w-4 h-4 mr-2" />
+                Copy URL
               </Button>
+              <div className="flex gap-2">
+                <ExportDialog preview={preview} style={style} cardRef={cardRef} />
+                <Button
+                  asChild
+                  size="sm"
+                  style={{ backgroundColor: cardStyle.accentColor }}
+                >
+                  <a
+                    href={preview.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-white"
+                  >
+                    Visit Site
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     );
@@ -301,36 +306,38 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
           )}
 
           {/* Actions */}
-          <div className="flex items-center justify-between">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleCopyUrl}
-              className="opacity-60 hover:opacity-100"
-              style={{ color: cardStyle.textColor }}
-            >
-              <Copy className="w-4 h-4 mr-2" />
-              Copy URL
-            </Button>
-            <div className="flex gap-2">
-              <ExportDialog preview={preview} style={style} cardRef={cardRef} />
+          {!hideButtons && (
+            <div className="flex items-center justify-between">
               <Button
-                asChild
+                variant="ghost"
                 size="sm"
-                style={{ backgroundColor: cardStyle.accentColor }}
+                onClick={handleCopyUrl}
+                className="opacity-60 hover:opacity-100"
+                style={{ color: cardStyle.textColor }}
               >
-                <a
-                  href={preview.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-white"
-                >
-                  Visit Site
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                <Copy className="w-4 h-4 mr-2" />
+                Copy URL
               </Button>
+              <div className="flex gap-2">
+                <ExportDialog preview={preview} style={style} cardRef={cardRef} />
+                <Button
+                  asChild
+                  size="sm"
+                  style={{ backgroundColor: cardStyle.accentColor }}
+                >
+                  <a
+                    href={preview.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-white"
+                  >
+                    Visit Site
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
