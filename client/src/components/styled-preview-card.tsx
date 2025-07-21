@@ -3,7 +3,7 @@ import { Copy, ExternalLink, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ExportDialog } from "./export-dialog";
-import type { LinkPreview, PreviewStyle } from "@shared/schema";
+import type { LinkPreview, PreviewStyle } from "@/types";
 
 interface StyledPreviewCardProps {
   preview: LinkPreview;
@@ -34,7 +34,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
   const getCleanUrl = (url: string) => {
     try {
       const urlObj = new URL(url);
-      return urlObj.hostname.replace('www.', '');
+      return urlObj.hostname.replace("www.", "");
     } catch {
       return url;
     }
@@ -53,7 +53,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
     accentColor: "#3b82f6",
     showImage: true,
     showFavicon: true,
-    layout: "horizontal"
+    layout: "horizontal",
   };
 
   const cardClasses = `overflow-hidden hover:shadow-md transition-shadow duration-200`;
@@ -82,7 +82,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
                     alt="Site favicon"
                     className="w-4 h-4"
                     onError={(e) => {
-                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.style.display = "none";
                     }}
                   />
                 ) : (
@@ -97,7 +97,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
 
           {/* Title */}
           <h2 className="text-lg font-semibold mb-2 line-clamp-2">
-            {preview.title || 'No title available'}
+            {preview.title || "No title available"}
           </h2>
 
           {/* Description */}
@@ -108,7 +108,10 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
           )}
 
           {/* Actions */}
-          <div className="flex items-center justify-between">
+          <div
+            className="flex items-center justify-between"
+            id="preview-card-actions"
+          >
             <Button
               variant="ghost"
               size="sm"
@@ -121,7 +124,11 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
             </Button>
             <div className="flex gap-2">
               <ExportDialog preview={preview} style={style} cardRef={cardRef} />
-              <Button asChild size="sm" style={{ backgroundColor: cardStyle.accentColor }}>
+              <Button
+                asChild
+                size="sm"
+                style={{ backgroundColor: cardStyle.accentColor }}
+              >
                 <a
                   href={preview.url}
                   target="_blank"
@@ -170,7 +177,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
                     alt="Site favicon"
                     className="w-4 h-4"
                     onError={(e) => {
-                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.style.display = "none";
                     }}
                   />
                 ) : (
@@ -185,7 +192,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
 
           {/* Title */}
           <h2 className="text-xl font-semibold mb-3 line-clamp-2">
-            {preview.title || 'No title available'}
+            {preview.title || "No title available"}
           </h2>
 
           {/* Description */}
@@ -196,7 +203,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
           )}
 
           {/* Actions */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between preview-card-actions-styled">
             <Button
               variant="ghost"
               size="sm"
@@ -209,7 +216,11 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
             </Button>
             <div className="flex gap-2">
               <ExportDialog preview={preview} style={style} cardRef={cardRef} />
-              <Button asChild size="sm" style={{ backgroundColor: cardStyle.accentColor }}>
+              <Button
+                asChild
+                size="sm"
+                style={{ backgroundColor: cardStyle.accentColor }}
+              >
                 <a
                   href={preview.url}
                   target="_blank"
@@ -264,7 +275,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
                     alt="Site favicon"
                     className="w-4 h-4"
                     onError={(e) => {
-                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.style.display = "none";
                     }}
                   />
                 ) : (
@@ -279,7 +290,7 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
 
           {/* Title */}
           <h2 className="text-xl font-semibold mb-3 line-clamp-2">
-            {preview.title || 'No title available'}
+            {preview.title || "No title available"}
           </h2>
 
           {/* Description */}
@@ -303,7 +314,11 @@ export function StyledPreviewCard({ preview, style }: StyledPreviewCardProps) {
             </Button>
             <div className="flex gap-2">
               <ExportDialog preview={preview} style={style} cardRef={cardRef} />
-              <Button asChild size="sm" style={{ backgroundColor: cardStyle.accentColor }}>
+              <Button
+                asChild
+                size="sm"
+                style={{ backgroundColor: cardStyle.accentColor }}
+              >
                 <a
                   href={preview.url}
                   target="_blank"

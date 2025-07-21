@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import type { LinkPreview, LinkPreviewRequest } from "@shared/schema";
+import type { LinkPreview, LinkPreviewRequest } from "@/types";
 
 interface CacheControlsProps {
   preview: LinkPreview | null;
@@ -13,13 +13,17 @@ interface CacheControlsProps {
   currentUrl: string;
 }
 
-export function CacheControls({ preview, onPreviewUpdated, currentUrl }: CacheControlsProps) {
+export function CacheControls({
+  preview,
+  onPreviewUpdated,
+  currentUrl,
+}: CacheControlsProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const refreshMutation = useMutation({
     mutationFn: async (data: LinkPreviewRequest) => {
-      const response = await apiRequest('POST', '/api/preview', data);
+      const response = await apiRequest("POST", "/api/preview", data);
       return response.json();
     },
     onSuccess: (updatedPreview: LinkPreview) => {
@@ -40,9 +44,9 @@ export function CacheControls({ preview, onPreviewUpdated, currentUrl }: CacheCo
 
   const handleRefresh = () => {
     if (!currentUrl) return;
-    refreshMutation.mutate({ 
-      url: currentUrl, 
-      forceRefresh: true 
+    refreshMutation.mutate({
+      url: currentUrl,
+      forceRefresh: true,
     });
   };
 
@@ -53,7 +57,7 @@ export function CacheControls({ preview, onPreviewUpdated, currentUrl }: CacheCo
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
 
-    if (diffMins < 1) return 'Just now';
+    if (diffMins < 1) return "Just now";
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
     return `${diffDays}d ago`;
@@ -61,8 +65,10 @@ export function CacheControls({ preview, onPreviewUpdated, currentUrl }: CacheCo
 
   if (!preview) return null;
 
-  const isOld = preview.createdAt && 
-    (new Date().getTime() - new Date(preview.createdAt).getTime()) > (24 * 60 * 60 * 1000); // 24 hours
+  const isOld =
+    preview.createdAt &&
+    new Date().getTime() - new Date(preview.createdAt).getTime() >
+      24 * 60 * 60 * 1000; // 24 hours
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-4">
@@ -72,7 +78,7 @@ export function CacheControls({ preview, onPreviewUpdated, currentUrl }: CacheCo
             <Clock className="w-4 h-4" />
             <span>Cached {getTimeAgo(new Date(preview.createdAt!))}</span>
           </div>
-          
+
           {isOld && (
             <Badge variant="secondary" className="text-xs">
               <AlertCircle className="w-3 h-3 mr-1" />
@@ -88,14 +94,19 @@ export function CacheControls({ preview, onPreviewUpdated, currentUrl }: CacheCo
           disabled={refreshMutation.isPending || !currentUrl}
           className="text-gray-500 hover:text-primary"
         >
-          <RefreshCw className={`w-4 h-4 mr-2 ${refreshMutation.isPending ? 'animate-spin' : ''}`} />
-          {refreshMutation.isPending ? 'Refreshing...' : 'Refresh'}
+          <RefreshCw
+            className={`w-4 h-4 mr-2 ${
+              refreshMutation.isPending ? "animate-spin" : ""
+            }`}
+          />
+          {refreshMutation.isPending ? "Refreshing..." : "Refresh"}
         </Button>
       </div>
-      
+
       {isOld && (
         <div className="mt-2 text-xs text-gray-500">
-          This preview is more than 24 hours old. Content may have changed since then.
+          This preview is more than 24 hours old. Content may have changed since
+          then.
         </div>
       )}
     </div>

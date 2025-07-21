@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "lucide-react";
 import { LinkPreviewForm } from "@/components/link-preview-form";
 import { StyledPreviewCard } from "@/components/styled-preview-card";
@@ -6,7 +6,10 @@ import { StyleSelector } from "@/components/style-selector";
 import { CacheControls } from "@/components/cache-controls";
 import { ExampleUrls } from "@/components/example-urls";
 import { FeaturesSection } from "@/components/features-section";
-import type { LinkPreview, PreviewStyle } from "@shared/schema";
+import type { LinkPreview, PreviewStyle } from "@/types";
+import { Switch } from "@/components/ui/switch";
+import { hideElements } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
 
 export default function Home() {
   const [previewData, setPreviewData] = useState<LinkPreview | null>(null);
@@ -39,8 +42,12 @@ export default function Home() {
               <Link className="text-white" size={20} />
             </div>
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">Link Preview Generator</h1>
-              <p className="text-gray-600 text-sm">Generate beautiful preview cards for any URL</p>
+              <h1 className="text-2xl font-semibold text-gray-900">
+                Link Preview Generator
+              </h1>
+              <p className="text-gray-600 text-sm">
+                Generate beautiful preview cards for any URL
+              </p>
             </div>
           </div>
         </div>
@@ -48,21 +55,21 @@ export default function Home() {
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* URL Input Form */}
-        <LinkPreviewForm 
+        <LinkPreviewForm
           onPreviewGenerated={handlePreviewGenerated}
           inputUrl={inputUrl}
           onInputUrlChange={setInputUrl}
         />
 
         {/* Style Selector */}
-        <StyleSelector 
+        <StyleSelector
           selectedStyleId={selectedStyle?.id || null}
           onStyleSelect={handleStyleSelect}
         />
 
         {/* Cache Controls */}
         {previewData && (
-          <CacheControls 
+          <CacheControls
             preview={previewData}
             onPreviewUpdated={handlePreviewUpdated}
             currentUrl={inputUrl}
@@ -72,10 +79,8 @@ export default function Home() {
         {/* Preview Card */}
         {previewData && (
           <div className="mb-8">
-            <StyledPreviewCard 
-              preview={previewData} 
-              style={selectedStyle}
-            />
+            <HideButtonsSwitch />
+            <StyledPreviewCard preview={previewData} style={selectedStyle} />
           </div>
         )}
 
@@ -90,7 +95,10 @@ export default function Home() {
       <footer className="mt-16 bg-white border-t border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="text-center text-gray-500 text-sm">
-            <p>Built with modern web technologies for fast and reliable link previews.</p>
+            <p>
+              Built with modern web technologies for fast and reliable link
+              previews.
+            </p>
             <div className="mt-2 flex items-center justify-center gap-4">
               <span className="flex items-center gap-1">
                 <span className="text-xs">⚡</span>
@@ -108,6 +116,40 @@ export default function Home() {
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function HideButtonsSwitch() {
+  const [hideButtons, setHideButtons] = useState(false);
+  const restoreButtons = useRef<() => void>(() => {});
+  function hideButtonsFn() {
+    const buttonsToHide = [
+      document.querySelector(".preview-card-actions-styled") as HTMLElement,
+      document.querySelector(".preview-card-actions-unstyled") as HTMLElement,
+    ];
+    console.log(buttonsToHide);
+    buttonsToHide.forEach((button) => {
+      if (!button) throw new Error("Button not found");
+    });
+    const { restore } = hideElements(buttonsToHide);
+    return restore;
+  }
+
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <Switch
+        checked={hideButtons}
+        onCheckedChange={(checked) => {
+          setHideButtons(checked);
+          if (checked) {
+            restoreButtons.current = hideButtonsFn();
+          } else {
+            restoreButtons.current();
+          }
+        }}
+      />
+      <Label>Hide Buttons</Label>
     </div>
   );
 }

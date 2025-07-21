@@ -1,0 +1,23 @@
+{
+  "tasks": {
+    "dev": "deno run -A --watch main.ts",
+    "build:node": "cd ../client && npm run build && cp -r dist ../server",
+    "start": "deno run build:node && deno run -A main.ts"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1"
+  },
+  "deploy": {
+    "project": "f9991f5a-f6f6-445a-a7e7-86421361a1b2",
+    "exclude": [
+      "**/node_modules",
+      "**/node_modules"
+    ],
+    "include": [
+      "main.ts",
+      "*.ts",
+      "dist"
+    ],
+    "entrypoint": "main.ts"
+  }
+}

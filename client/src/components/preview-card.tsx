@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Copy, ExternalLink, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import type { LinkPreview } from "@shared/schema";
+import type { LinkPreview } from "@/types";
 
 interface PreviewCardProps {
   preview: LinkPreview;
@@ -31,7 +31,7 @@ export function PreviewCard({ preview }: PreviewCardProps) {
   const getCleanUrl = (url: string) => {
     try {
       const urlObj = new URL(url);
-      return urlObj.hostname.replace('www.', '');
+      return urlObj.hostname.replace("www.", "");
     } catch {
       return url;
     }
@@ -70,12 +70,17 @@ export function PreviewCard({ preview }: PreviewCardProps) {
                 alt="Site favicon"
                 className="w-4 h-4"
                 onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                  e.currentTarget.style.display = "none";
+                  e.currentTarget.nextElementSibling?.classList.remove(
+                    "hidden"
+                  );
                 }}
               />
             ) : null}
-            <Globe className="w-3 h-3 text-gray-400" style={{ display: preview.favicon ? 'none' : 'block' }} />
+            <Globe
+              className="w-3 h-3 text-gray-400"
+              style={{ display: preview.favicon ? "none" : "block" }}
+            />
           </div>
           <span className="text-sm text-gray-500 truncate">
             {getCleanUrl(preview.url)}
@@ -84,7 +89,7 @@ export function PreviewCard({ preview }: PreviewCardProps) {
 
         {/* Title */}
         <h2 className="text-xl font-semibold text-gray-900 mb-3 line-clamp-2">
-          {preview.title || 'No title available'}
+          {preview.title || "No title available"}
         </h2>
 
         {/* Description */}
@@ -95,7 +100,7 @@ export function PreviewCard({ preview }: PreviewCardProps) {
         )}
 
         {/* Actions */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between preview-card-actions-unstyled">
           <Button
             variant="ghost"
             size="sm"

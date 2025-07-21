@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import type { LinkPreview, LinkPreviewRequest } from "@shared/schema";
+import type { LinkPreview, LinkPreviewRequest } from "@/types";
 
 interface LinkPreviewFormProps {
   onPreviewGenerated: (preview: LinkPreview) => void;
@@ -14,18 +14,25 @@ interface LinkPreviewFormProps {
   onInputUrlChange: (url: string) => void;
 }
 
-export function LinkPreviewForm({ onPreviewGenerated, inputUrl, onInputUrlChange }: LinkPreviewFormProps) {
-  const [validationState, setValidationState] = useState<'idle' | 'valid' | 'invalid'>('idle');
+export function LinkPreviewForm({
+  onPreviewGenerated,
+  inputUrl,
+  onInputUrlChange,
+}: LinkPreviewFormProps) {
+  const [validationState, setValidationState] = useState<
+    "idle" | "valid" | "invalid"
+  >("idle");
   const { toast } = useToast();
 
-  const urlPattern = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+  const urlPattern =
+    /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 
   const validateUrl = (url: string) => {
     if (!url) {
-      setValidationState('idle');
+      setValidationState("idle");
       return;
     }
-    setValidationState(urlPattern.test(url) ? 'valid' : 'invalid');
+    setValidationState(urlPattern.test(url) ? "valid" : "invalid");
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,7 +43,7 @@ export function LinkPreviewForm({ onPreviewGenerated, inputUrl, onInputUrlChange
 
   const generatePreviewMutation = useMutation({
     mutationFn: async (data: LinkPreviewRequest) => {
-      const response = await apiRequest('POST', '/api/preview', data);
+      const response = await apiRequest("POST", "/api/preview", data);
       return response.json();
     },
     onSuccess: (preview: LinkPreview) => {
@@ -57,20 +64,23 @@ export function LinkPreviewForm({ onPreviewGenerated, inputUrl, onInputUrlChange
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validationState === 'valid') {
+    if (validationState === "valid") {
       generatePreviewMutation.mutate({ url: inputUrl });
     }
   };
 
-  const isValid = validationState === 'valid';
-  const isInvalid = validationState === 'invalid';
+  const isValid = validationState === "valid";
+  const isInvalid = validationState === "invalid";
   const isLoading = generatePreviewMutation.isPending;
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="url-input" className="block text-sm font-medium text-gray-700 mb-2">
+          <Label
+            htmlFor="url-input"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             Enter URL to preview
           </Label>
           <div className="relative">
@@ -118,7 +128,7 @@ export function LinkPreviewForm({ onPreviewGenerated, inputUrl, onInputUrlChange
               Generating...
             </>
           ) : (
-            'Generate Preview'
+            "Generate Preview"
           )}
         </Button>
       </form>
