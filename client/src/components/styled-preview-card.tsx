@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, RefObject, useEffect } from "react";
 import { Copy, ExternalLink, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -9,12 +9,17 @@ interface StyledPreviewCardProps {
   preview: LinkPreview;
   style?: PreviewStyle | null;
   hideButtons?: boolean;
+  cardRef: RefObject<HTMLDivElement>;
 }
 
-export function StyledPreviewCard({ preview, style, hideButtons }: StyledPreviewCardProps) {
+export function StyledPreviewCard({
+  preview,
+  style,
+  hideButtons,
+  cardRef,
+}: StyledPreviewCardProps) {
   const { toast } = useToast();
   const [imageError, setImageError] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
 
   const handleCopyUrl = async () => {
     try {
@@ -82,6 +87,7 @@ export function StyledPreviewCard({ preview, style, hideButtons }: StyledPreview
                     src={preview.favicon}
                     alt="Site favicon"
                     className="w-4 h-4"
+                    // crossOrigin="anonymous"
                     onError={(e) => {
                       e.currentTarget.style.display = "none";
                     }}
@@ -125,7 +131,11 @@ export function StyledPreviewCard({ preview, style, hideButtons }: StyledPreview
                 Copy
               </Button>
               <div className="flex gap-2">
-                <ExportDialog preview={preview} style={style} cardRef={cardRef} />
+                <ExportDialog
+                  preview={preview}
+                  style={style}
+                  cardRef={cardRef}
+                />
                 <Button
                   asChild
                   size="sm"
@@ -179,6 +189,7 @@ export function StyledPreviewCard({ preview, style, hideButtons }: StyledPreview
                     src={preview.favicon}
                     alt="Site favicon"
                     className="w-4 h-4"
+                    // crossOrigin="anonymous"
                     onError={(e) => {
                       e.currentTarget.style.display = "none";
                     }}
@@ -219,7 +230,11 @@ export function StyledPreviewCard({ preview, style, hideButtons }: StyledPreview
                 Copy URL
               </Button>
               <div className="flex gap-2">
-                <ExportDialog preview={preview} style={style} cardRef={cardRef} />
+                <ExportDialog
+                  preview={preview}
+                  style={style}
+                  cardRef={cardRef}
+                />
                 <Button
                   asChild
                   size="sm"
@@ -279,6 +294,7 @@ export function StyledPreviewCard({ preview, style, hideButtons }: StyledPreview
                     src={preview.favicon}
                     alt="Site favicon"
                     className="w-4 h-4"
+                    // crossOrigin="anonymous"
                     onError={(e) => {
                       e.currentTarget.style.display = "none";
                     }}
@@ -319,7 +335,11 @@ export function StyledPreviewCard({ preview, style, hideButtons }: StyledPreview
                 Copy URL
               </Button>
               <div className="flex gap-2">
-                <ExportDialog preview={preview} style={style} cardRef={cardRef} />
+                <ExportDialog
+                  preview={preview}
+                  style={style}
+                  cardRef={cardRef}
+                />
                 <Button
                   asChild
                   size="sm"

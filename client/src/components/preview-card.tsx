@@ -70,6 +70,7 @@ export function PreviewCard({ preview, hideButtons }: PreviewCardProps) {
                 src={preview.favicon}
                 alt="Site favicon"
                 className="w-4 h-4"
+                // crossOrigin="anonymous"
                 onError={(e) => {
                   e.currentTarget.style.display = "none";
                   e.currentTarget.nextElementSibling?.classList.remove(
