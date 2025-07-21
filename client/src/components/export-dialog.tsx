@@ -20,7 +20,6 @@ import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import html2canvas from "html2canvas";
 import type { LinkPreview, PreviewStyle } from "@/types";
-import { hideElements } from "@/lib/utils";
 
 interface ExportDialogProps {
   preview: LinkPreview;
@@ -49,7 +48,12 @@ export function ExportDialog({ preview, style, cardRef }: ExportDialogProps) {
 
     try {
       const elementToCapture = cardRef.current;
-
+      // Wait for all images to load
+      // await waitForImagesToLoad(elementToCapture);
+      // // Wait for fonts to load (if custom fonts are used)
+      // if (document.fonts && document.fonts.ready) {
+      //   await document.fonts.ready;
+      // }
       const canvas = await html2canvas(elementToCapture, {
         backgroundColor: null, // Use transparent background
         scale: 2, // For better quality
